@@ -1,46 +1,50 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
+#include "buffer.h"
 
-
-struct Buffer
-{
-    long size;
-    char *data;
-};
-
-
-struct Buffer initBuffer(int *(array)) {
-    struct Buffer buffer;
-    buffer.size = sizeof(array);
-    
-    char *data = (char *)malloc( 200 * sizeof(char) );
-
-    strcpy(data, "Zara ali a DPS student.");
-
-    buffer.data = data;
-
-    return buffer;
+void println() {
+    printf("\n");
 }
 
-void printBuffer(struct Buffer buffer)
-{
-    printf("size: %lu", buffer.size);
-    printf("size: %s", buffer.data);
-};
+void printByte(int byte, long index) {
+    printf("{ index: %lu, byte: %d }\n", index, byte);
+}
 
+void printBuffer(Buffer buffer) {
+    readEachByte(buffer, &printByte);
+}
 
 int main()
 {
-    int size;
-    int *data;
-    struct Buffer buffer;
+    Buffer buffer = allocBuffer(10);
+    char val[10] = {1,2,3,4,5,6,7,8,9,10};
+    Buffer fromArrayedBuffer = allocBufferFrom(val, 10);
 
-    int data2[5] = {1, 2, 3, 4, 5};
+    printf("byteLength: %lu", getByteLength(buffer));
+    println();
+    println();
 
-    size = 100;
-
-    buffer = initBuffer(data2);
+    printf("initialed buffer:");
+    println();
 
     printBuffer(buffer);
+    
+    writeInt8(buffer, &val[0], 0);
+    writeInt8(buffer, &val[1], 1);
+    writeInt8(buffer, &val[2], 2);
+    writeInt8(buffer, &val[3], 3);
+
+    println();
+    printf("after writeInt8:");
+    println();
+
+    printBuffer(buffer);
+
+    println();
+
+    printf("BufferFromArray:");
+    println();
+    printBuffer(fromArrayedBuffer);
 }
