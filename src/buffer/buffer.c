@@ -28,7 +28,7 @@ int readInt8(Buffer buffer, long offset) {
     return buffer.arrayByffer[offset];
 }
 
-void readBytes(Buffer buffer, void fn(int byte, long index)) {
+void readBytes(Buffer buffer, void (*fn)(int byte, long index)) {
     long byteLength = getByteLength(buffer);
     long i = 0;
 
