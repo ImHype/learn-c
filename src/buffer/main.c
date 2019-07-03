@@ -9,11 +9,12 @@ void println() {
 }
 
 void printByte(int byte, long index) {
-    printf("{ index: %lu, byte: %d }\n", index, byte);
+    printf("0x%x ", byte);
 }
 
 void printBuffer(Buffer buffer) {
     readBytes(buffer, &printByte);
+    println();
 }
 
 int main()
@@ -24,6 +25,7 @@ int main()
 
     unsigned char val[10] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff};
     Buffer fromArrayedBuffer = allocBufferFrom(val, 10);
+
 
     printf("byteLength: %lu", getByteLength(buffer));
     println();
@@ -47,7 +49,13 @@ int main()
 
     println();
 
-    printf("BufferFromArray:");
+    printf("init buffer from char array:");
     println();
     printBuffer(fromArrayedBuffer);
+
+    printf("init buffer from string:");
+    println();
+
+    Buffer buf = allocBufferFrom((unsigned char*) "hello_world", 11);
+    printBuffer(buf);
 }
