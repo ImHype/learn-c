@@ -1,5 +1,17 @@
 helloworld:
-	gcc ./hello-world/main.c && ./a.out
+	gcc ./src/hello-world/*.c && ./a.out
 
 globalVariable:
-	gcc ./global-variable/*.c && ./a.out
+	gcc ./src/global-variable/*.c && ./a.out
+
+
+assert:
+	gcc ./src/assert/*.c && ./a.out
+
+
+callback:
+	gcc ./src/callback/*.c && ./a.out
+
+
+buffer:
+	gcc ./src/buffer/*.c && ./a.out
