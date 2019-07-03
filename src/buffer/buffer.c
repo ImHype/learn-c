@@ -4,12 +4,6 @@
 #include <assert.h>
 #include "buffer.h"
 
-char nilByte = 0;
-char nilBytes[] = {};
-
-
-Buffer bufferAlloc(int byteLength);
-
 
 Buffer fillBuffer(Buffer buffer, char byte) {
     long byteLength = getByteLength(buffer);
@@ -34,7 +28,7 @@ int readInt8(Buffer buffer, long offset) {
     return buffer.arrayByffer[offset];
 }
 
-void readEachByte(Buffer buffer, void fn(int byte, long index)) {
+void readBytes(Buffer buffer, void fn(int byte, long index)) {
     long byteLength = getByteLength(buffer);
     long i = 0;
 
@@ -44,7 +38,7 @@ void readEachByte(Buffer buffer, void fn(int byte, long index)) {
     }
 }
 
-void writeEachByte(Buffer buffer, char *(array), long arraySize) {
+void writeBytes(Buffer buffer, char *(array), long arraySize) {
     long byteLength = getByteLength(buffer);
     long size = byteLength > size ? byteLength: size;
     long i = 0;
@@ -69,7 +63,7 @@ Buffer allocBufferFrom(char *(array), int arraySize) {
     buffer.byteLength = arraySize;
     buffer.arrayByffer = (char *)malloc( arraySize * sizeof(char) );
 
-    writeEachByte(buffer, array, arraySize);
+    writeBytes(buffer, array, arraySize);
 
     return buffer;
 }

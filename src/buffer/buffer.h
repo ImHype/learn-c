@@ -13,8 +13,8 @@ Buffer fillBuffer(Buffer buffer, char byte);
 
 long getByteLength(Buffer buffer);
 
-void readEachByte(Buffer buffer, void fn(int byte, long index));
-void writeEachByte(Buffer buffer, char *(array), long arraySize);
+void readBytes(Buffer buffer, void fn(int byte, long index));
+void writeBytes(Buffer buffer, char *(array), long arraySize);
 
 void writeInt8(Buffer buffer, char *(value), long offset);
 int readInt8(Buffer buffer, long offset);

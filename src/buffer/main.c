@@ -13,7 +13,7 @@ void printByte(int byte, long index) {
 }
 
 void printBuffer(Buffer buffer) {
-    readEachByte(buffer, &printByte);
+    readBytes(buffer, &printByte);
 }
 
 int main()
