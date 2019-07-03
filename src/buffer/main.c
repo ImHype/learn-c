@@ -19,7 +19,10 @@ void printBuffer(Buffer buffer) {
 int main()
 {
     Buffer buffer = allocBuffer(10);
-    char val[10] = {1,2,3,4,5,6,7,8,9,10};
+    unsigned char hello = 0x1;
+    printf("%d", (int) hello);
+
+    unsigned char val[10] = {0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff};
     Buffer fromArrayedBuffer = allocBufferFrom(val, 10);
 
     printf("byteLength: %lu", getByteLength(buffer));

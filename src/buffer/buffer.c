@@ -5,7 +5,7 @@
 #include "buffer.h"
 
 
-Buffer fillBuffer(Buffer buffer, char byte) {
+Buffer fillBuffer(Buffer buffer, unsigned char byte) {
     long byteLength = getByteLength(buffer);
     long i = 0;
     while(i < byteLength) {
@@ -19,7 +19,7 @@ long getByteLength(Buffer buffer) {
     return buffer.byteLength;
 }
 
-void writeInt8(Buffer buffer, char *(value), long offset) {
+void writeInt8(Buffer buffer, unsigned char *(value), long offset) {
     assert(offset <= buffer.byteLength - 1);
     buffer.arrayByffer[offset] = *value;
 }
@@ -38,14 +38,13 @@ void readBytes(Buffer buffer, void fn(int byte, long index)) {
     }
 }
 
-void writeBytes(Buffer buffer, char *(array), long arraySize) {
+void writeBytes(Buffer buffer, unsigned char *(array), long arraySize) {
     long byteLength = getByteLength(buffer);
     long size = byteLength > size ? byteLength: size;
     long i = 0;
 
     while(i < size) {
-        char byte = array[i];
-        writeInt8(buffer, &byte, i);
+        writeInt8(buffer, &array[i], i);
         i++;
     }
 }
@@ -53,15 +52,15 @@ void writeBytes(Buffer buffer, char *(array), long arraySize) {
 Buffer allocBuffer(int byteLength) {
     Buffer buffer;
     buffer.byteLength = byteLength;
-    buffer.arrayByffer = (char *)malloc( byteLength * sizeof(char) );
+    buffer.arrayByffer = (unsigned char *)malloc( byteLength * sizeof(char) );
     fillBuffer(buffer, 0);
     return buffer;
 }
 
-Buffer allocBufferFrom(char *(array), int arraySize) {
+Buffer allocBufferFrom(unsigned char *(array), int arraySize) {
     Buffer buffer;
     buffer.byteLength = arraySize;
-    buffer.arrayByffer = (char *)malloc( arraySize * sizeof(char) );
+    buffer.arrayByffer = (unsigned char *)malloc( arraySize * sizeof(char) );
 
     writeBytes(buffer, array, arraySize);
 
