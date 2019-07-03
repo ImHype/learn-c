@@ -15,3 +15,6 @@ callback:
 
 buffer:
 	gcc ./src/buffer/*.c && ./a.out
+
+event:
+	gcc ./src/event/*.c && ./a.out
