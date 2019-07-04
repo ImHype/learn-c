@@ -17,4 +17,8 @@ buffer:
 	gcc ./src/buffer/*.c && ./a.out
 
 event:
-	gcc ./src/event/*.c && ./a.out
+	gcc ./src/event/*.c ./src/linked-list/list.c && ./a.out
+
+
+calc:
+	gcc ./src/calc/*.c && ./a.out
