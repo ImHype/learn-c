@@ -23,16 +23,27 @@ void addEvent(EventEmitter *eventEmitter, char * name, Callback callback) {
     Handler * handler = createHandler(name, callback);
     if (eventEmitter->handler == NULL) {
         eventEmitter->handler = handler;
+    } else {
+        EventEmitter * thisEventEmitter = createEventEmitter();
+        thisEventEmitter->handler = handler;
+        while (eventEmitter->next != NULL)
+        {
+            eventEmitter = eventEmitter->next;
+        }
+        eventEmitter->next = thisEventEmitter;
     }
 }
 
-void triggerEvent(EventEmitter *eventEmitter, char * name, char * message) {
+void triggerEvent(EventEmitter *eventEmitter, char * name, void * message) {
     Handler * handler = eventEmitter -> handler;
 
     while (eventEmitter != NULL)
     {
-        (eventEmitter->handler->cb)(message);
-        if (eventEmitter->next) {
+        if (strcmp(eventEmitter->handler->name, name) == 0) {
+            (eventEmitter->handler->cb)(message);
+        }
+
+        if (eventEmitter->next != NULL) {
             eventEmitter = eventEmitter->next;
         } else {
             break;

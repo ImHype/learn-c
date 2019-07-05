@@ -1,4 +1,4 @@
-typedef void (*Callback)(char* message);
+typedef void (*Callback)(void*);
 
 
 typedef struct Handler {
@@ -19,9 +19,9 @@ typedef LinkedList EventEmitter;
 #define MAX_NAME_LENGTH 10;
 
 EventEmitter *createEventEmitter();
-void on(char* name, Callback cb);
-void emit(char* name, char* message);
-void addEvent(EventEmitter *eventEmitter, char * name, Callback callback);
-void triggerEvent(EventEmitter *eventEmitter, char * name, char * message);
+void on(char*, Callback);
+void emit(char*, char*);
+void addEvent(EventEmitter *, char *, Callback);
+void triggerEvent(EventEmitter *, char* , void *);
 
 #endif
