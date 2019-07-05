@@ -13,19 +13,19 @@ Handler * createHandler(char * name, Callback callback) {
 }
 
 EventEmitter *createEventEmitter() {
-    LinkedList *eventEmitter = (LinkedList*) malloc(sizeof(LinkedList));
-    eventEmitter->handler = NULL;
+    EventEmitter *eventEmitter = (EventEmitter*) malloc(sizeof(EventEmitter));
+    eventEmitter->data = NULL;
     eventEmitter->next = NULL;
     return eventEmitter;
 };
 
 void addEvent(EventEmitter *eventEmitter, char * name, Callback callback) {
     Handler * handler = createHandler(name, callback);
-    if (eventEmitter->handler == NULL) {
-        eventEmitter->handler = handler;
+    if (eventEmitter->data == NULL) {
+        eventEmitter->data = handler;
     } else {
         EventEmitter * thisEventEmitter = createEventEmitter();
-        thisEventEmitter->handler = handler;
+        thisEventEmitter->data = handler;
         while (eventEmitter->next != NULL)
         {
             eventEmitter = eventEmitter->next;
@@ -35,12 +35,13 @@ void addEvent(EventEmitter *eventEmitter, char * name, Callback callback) {
 }
 
 void triggerEvent(EventEmitter *eventEmitter, char * name, void * message) {
-    Handler * handler = eventEmitter -> handler;
+    Handler * handler = eventEmitter -> data;
 
     while (eventEmitter != NULL)
     {
-        if (strcmp(eventEmitter->handler->name, name) == 0) {
-            (eventEmitter->handler->cb)(message);
+        Handler * handler = eventEmitter->data;
+        if (strcmp(handler->name, name) == 0) {
+            (handler->cb)(message);
         }
 
         if (eventEmitter->next != NULL) {

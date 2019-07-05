@@ -6,12 +6,12 @@ typedef struct Handler {
     Callback cb;
 } Handler;
 
-typedef struct LinkedList {
-    Handler * handler;
-    struct LinkedList *next;
-} LinkedList;
+typedef struct LinkedListNode {
+    void * data;
+    struct LinkedListNode *next;
+} LinkedListNode;
 
-typedef LinkedList EventEmitter;
+typedef LinkedListNode EventEmitter;
 
 #ifndef EVENT_HANDLER_H
 #define EVENT_HANDLER_H
