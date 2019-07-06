@@ -1,3 +1,4 @@
+# Trying Features 
 helloworld:
 	gcc ./c-features/hello-world/*.c && ./a.out
 
@@ -16,9 +17,23 @@ voidp:
 callback:
 	gcc ./c-features/callback/*.c && ./a.out
 
+fork:
+	gcc ./c-features/process/fork.c && ./a.out
+
+pipe:
+	gcc ./c-features/process/transfer-by-pipe.c && ./a.out
+
+signal:
+	gcc ./c-features/process/signal.c && ./a.out
+
+write:
+	gcc ./c-features/fd/write.c && ./a.out
+
+read:
+	gcc ./c-features/fd/read.c && ./a.out
 
 
-
+# Some wheels
 assert:
 	gcc ./src/assert/*.c && ./a.out
 
