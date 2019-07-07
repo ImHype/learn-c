@@ -50,19 +50,19 @@ int main()
 
         printf("size: %lu", strlen(input_str)+1);
         write(fd1[1], input_str, strlen(input_str)+1); 
-        // close(fd1[1]); 
+        close(fd1[1]); 
   
         // Wait for child to send a string 
         wait(NULL); 
   
-        // close(fd2[1]); // Close writing end of second pipe 
+        close(fd2[1]); // Close writing end of second pipe 
   
         // Read string from child, print it and close 
         // reading end. 
-        // printf("start reading");
-        // read(fd2[0], concat_str, 100); 
-        // printf("%s", strcat(concated_str, concat_str)); 
-        // close(fd2[0]); 
+        printf("start reading");
+        read(fd2[0], concat_str, 100); 
+        printf("%s", strcat(concated_str, concat_str)); 
+        close(fd2[0]); 
     } 
   
     // child process 
@@ -78,16 +78,16 @@ int main()
 
         printf("%s", strcat(concated_str, concat_str));
 
-        // strcat(concated_str, concat_str);
-        // strcat(concated_str, "\0");
-        // // Close both reading ends 
-        // close(fd1[0]); 
-        // close(fd2[0]); 
-        // sleep(1);
+        strcat(concated_str, concat_str);
+        strcat(concated_str, "\0");
+        // Close both reading ends 
+        close(fd1[0]); 
+        close(fd2[0]); 
+        sleep(1);
   
-        // // Write concatenated string and close writing end 
-        // write(fd2[1], concated_str, strlen(concated_str)+1); 
-        // close(fd2[1]); 
-        // exit(0); 
+        // Write concatenated string and close writing end 
+        write(fd2[1], concated_str, strlen(concated_str)+1); 
+        close(fd2[1]); 
+        exit(0); 
     } 
 } 

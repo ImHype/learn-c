@@ -1,62 +1,82 @@
 ## pipe_channel
 
+It's sp difficult to use the `PIPE` in C.
 
-the `pipe` operation is difficult to use.
+So I create this SDK to use it in simple way.
 
-So I create this util to create `PIPE` in easy way.
+### steps
+#### 1. create the pipe_channel
+```c
+pipe_channel_t * pipe_channel = fork_with_pipe_channel();
+```
+#### 2. then you could transfer message by the `pipe_channel`:
+* int read_pipe_channel(pipe_channel_t*, char *, int);
+* void write_pipe_channel(pipe_channel_t*, char *, int);
+* void close_pipe_channel(pipe_channel_t*);
+* char *read_until_end(pipe_channel_t *);
 
-### Using
 
+### showcase
 ```C
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <sys/types.h>
 #include "pipe_channel.h"
 
 
 int main(void)
 {
-    pid_tt   childpid;
-
-    pipe_channel_t * pipe_channel = create_pipe_channel(&childpid);
-
-    if ((childpid = fork()) == -1) {
-        perror("fork");
-        return 1;
-    }
-
-    init_pipe_channel(pipe_channel);
-
+    pipe_channel_t * pipe_channel = fork_with_pipe_channel();
     pid_tt pid = *pipe_channel->pid;
 
     if (pid == 0) {
-        char buffer[100];
-        read_pipe_channel(pipe_channel, buffer, 100);
+        char * buffer = read_until_end(pipe_channel);
+        printf("message from child:\n\n%s", buffer);
 
-        printf("recieved msg from parent: %s\n", buffer);
-        
-        char new_buffer[] = "Hello Parent";
-
-        write_pipe_channel(pipe_channel, new_buffer, strlen(new_buffer) + 1);
+        char new_buffer[4][100] = {"Hello Parent\n", "I'm Child Process\n", "Here is my message to you:\n", "I want to exit(0)\n"};
+        for (int i = 0; i < 4; i++)
+        {
+            write_pipe_channel(pipe_channel, new_buffer[i], strlen(new_buffer[i]));
+        }
+        close_pipe_channel(pipe_channel);
+        exit(0);
     } else if (pid > 0)
     {
-        char buffer[] = "Hello Child";
+        char buffer[4][100] = {"Hello Child\n", "I'm Parent Process\n", "Here is my message to you:\n", "Keep down and carry on\n"};
 
-        write_pipe_channel(pipe_channel, buffer, strlen(buffer) + 1);
+        for (int i = 0; i < 4; i++)
+        {
+            write_pipe_channel(pipe_channel, buffer[i], strlen(buffer[i]));
+        }
 
-        char res[100] = "";
-
-        read_pipe_channel(pipe_channel, res, 100);
-
-        printf("recieved msg from child: %s\n", res);
-
+        close_pipe_channel(pipe_channel);
         wait(NULL);
+
+        char * res = read_until_end(pipe_channel);
+
+        printf("\nmessage from parent:\n\n%s", res);
     }
 
     return 0;
 }
 
+```
+
+#### the output
+```bash
+gcc ./src/pipe_channel/*.c && ./a.out
+message from child:
+
+Hello Child
+I'm Parent Process
+Here is my message to you:
+Keep down and carry on
+
+message from parent:
+
+Hello Parent
+I'm Child Process
+Here is my message to you:
+I want to exit(0)
 ```
