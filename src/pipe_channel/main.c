@@ -6,6 +6,7 @@
 #include "pipe_channel.h"
 
 
+
 int main(void)
 {
     pid_tt   childpid;
@@ -22,19 +23,40 @@ int main(void)
     pid_tt pid = *pipe_channel->pid;
 
     if (pid == 0) {
-        char buffer[100];
-        read_pipe_channel(pipe_channel, buffer, 100);
+        char * buffer = read_until_end(pipe_channel);
+        printf("recieve data from child: %s\n", buffer);
 
-        printf("recieved msg from parent: %s\n", buffer);
-        
         char new_buffer[] = "Hello Parent";
-
         write_pipe_channel(pipe_channel, new_buffer, strlen(new_buffer) + 1);
     } else if (pid > 0)
     {
         char buffer[] = "Hello Child";
 
-        write_pipe_channel(pipe_channel, buffer, strlen(buffer) + 1);
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+        write_pipe_channel(pipe_channel, buffer, strlen(buffer));
+
+        close_pipe_channel(pipe_channel);
+
 
         char res[100] = "";
 

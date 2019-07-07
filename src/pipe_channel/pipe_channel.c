@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <math.h>
 #include <sys/types.h>
 #include "pipe_channel.h"
 
@@ -57,14 +58,53 @@ int read_pipe_channel(pipe_channel_t* pipe_channel, char * buffer, int size) {
     }
 }
 
-
-int write_pipe_channel(pipe_channel_t* pipe_channel, char * buffer, int size) {
+int get_pipe_channel_fd(pipe_channel_t* pipe_channel) {
     int *pid = pipe_channel->pid;
     channel_t channel = pipe_channel->channel;
 
     if (*pid > 0) {
-        return write(channel[1][1], buffer, size);
+        return channel[1][1];
     } else {
-        return write(channel[0][1], buffer, size);
+        return channel[0][1];
     }
+}
+
+
+void write_pipe_channel(pipe_channel_t* pipe_channel, char * buffer, int size) {
+    write(get_pipe_channel_fd(pipe_channel), buffer, size);
+}
+
+void close_pipe_channel(pipe_channel_t* pipe_channel) {
+    close(get_pipe_channel_fd(pipe_channel));
+}
+
+
+#define CHUNK_SIZE 4
+#define FRAME_BYTES 10
+
+
+char * read_until_end(pipe_channel_t *pipe_channel) {
+    int frame_size = 1;
+
+
+    int total_bytes = 0;
+    int read_bytes = 0;
+    char chunk[CHUNK_SIZE];
+
+    char * buffer = (char *) malloc(FRAME_BYTES * frame_size);
+
+    while((read_bytes = read_pipe_channel(pipe_channel, chunk, CHUNK_SIZE)) > 0) {
+        total_bytes = total_bytes + read_bytes;
+
+        if (total_bytes > FRAME_BYTES * frame_size) {
+            frame_size = ceil(total_bytes / FRAME_BYTES);
+            char * temp_buffer = (char *) malloc(FRAME_BYTES * frame_size);
+            memmove(temp_buffer, buffer, strlen(buffer));
+            buffer = temp_buffer;
+        }
+        
+        strcat(buffer, chunk);
+        memset(chunk, 0 , CHUNK_SIZE);
+    }
+    return buffer;
 }

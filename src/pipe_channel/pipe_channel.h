@@ -14,4 +14,8 @@ void init_pipe_channel(pipe_channel_t* pipe_channel);
 
 int read_pipe_channel(pipe_channel_t* pipe_channel, char * buffer, int size);
 
-int write_pipe_channel(pipe_channel_t* pipe_channel, char * buffer, int size);
+void write_pipe_channel(pipe_channel_t* pipe_channel, char * buffer, int size);
+
+void close_pipe_channel(pipe_channel_t* pipe_channel);
+
+char * read_until_end(pipe_channel_t *pipe_channel);
