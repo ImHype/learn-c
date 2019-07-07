@@ -58,4 +58,32 @@ int main()
 
     Buffer buf = allocBufferFrom((unsigned char*) "hello_world", 11);
     printBuffer(buf);
+
+
+    Buffer buffer2 = allocBuffer(4);
+    unsigned char item =  0x1;
+    unsigned char item2 =  0x1;
+
+    writeInt8(buffer, &item, 0);
+    writeInt8(buffer, &item2, 0);
+
+    short int i16 = readInt16(buffer, 0);
+    printf("i16 %d", i16);
+
+    int i32 = readInt32(buffer, 0);
+    printf("i32 %d", i32);
+
+    int i64 = readInt64(buffer, 0);
+    printf("i64 %d", i64);
+
+
+    unsigned short int ui16 = readInt16(buffer, 0);
+    printf("i16 %u", ui16);
+
+    unsigned int ui32 = readInt32(buffer, 0);
+    printf("i32 %u", ui32);
+
+    unsigned int ui64 = readInt64(buffer, 0);
+    printf("i64 %u", ui64);
+    
 }

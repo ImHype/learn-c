@@ -19,4 +19,11 @@ void writeBytes(Buffer buffer, unsigned char *(array), long arraySize);
 void writeInt8(Buffer buffer, unsigned char *(value), long offset);
 int readInt8(Buffer buffer, long offset);
 
+short int readInt16(Buffer buffer, long offset);
+short int readInt32(Buffer buffer, long offset);
+short int readInt64(Buffer buffer, long offset);
+
+short int readUInt16(Buffer buffer, long offset);
+short int readUInt32(Buffer buffer, long offset);
+short int readUInt64(Buffer buffer, long offset);
 #endif 
