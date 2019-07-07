@@ -20,8 +20,8 @@ callback:
 fork:
 	gcc ./c-features/process/fork.c && ./a.out
 
-pipe:
-	gcc ./c-features/process/transfer-by-pipe.c && ./a.out
+transfer-by-pipe:
+	gcc ./c-features/process/pipe.c && ./a.out
 
 signal:
 	gcc ./c-features/process/signal.c && ./a.out
@@ -31,6 +31,13 @@ write:
 
 read:
 	gcc ./c-features/fd/read.c && ./a.out
+
+fd:
+	gcc ./c-features/fd/main.c && ./a.out
+
+pipe-example:
+	gcc ./c-features/pipe/example.c && ./a.out
+
 
 
 # Some wheels
@@ -42,3 +49,6 @@ buffer:
 
 event:
 	gcc ./src/event/*.c && ./a.out
+
+pipe_channel:
+	gcc ./src/pipe_channel/*.c && ./a.out
