@@ -1,4 +1,4 @@
-## pipe_Channel
+## pipe_channel
 
 
 the `pipe` operation is difficult to use.

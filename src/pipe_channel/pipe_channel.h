@@ -15,4 +15,3 @@ void init_pipe_channel(pipe_channel_t* pipe_channel);
 int read_pipe_channel(pipe_channel_t* pipe_channel, char * buffer, int size);
 
 int write_pipe_channel(pipe_channel_t* pipe_channel, char * buffer, int size);
-
