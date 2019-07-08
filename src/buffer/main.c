@@ -77,13 +77,13 @@ int main()
     printf("i64 %d", i64);
 
 
-    unsigned short int ui16 = readInt16(buffer, 0);
+    short int ui16 = readInt16(buffer, 0);
     printf("i16 %u", ui16);
 
-    unsigned int ui32 = readInt32(buffer, 0);
+    int ui32 = readInt32(buffer, 0);
     printf("i32 %u", ui32);
 
-    unsigned int ui64 = readInt64(buffer, 0);
+    int ui64 = readInt64(buffer, 0);
     printf("i64 %u", ui64);
     
 }

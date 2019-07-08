@@ -42,13 +42,16 @@ pipe-example:
 
 # Some wheels
 assert:
-	gcc ./src/assert/*.c && ./a.out
+	@$(MAKE) assert.o && ./assert.o
 
 buffer:
-	gcc ./src/buffer/*.c && ./a.out
+	@$(MAKE) buffer.o && ./buffer.o
 
 event:
-	gcc ./src/event/*.c && ./a.out
+	@$(MAKE) event.o && ./event.o
 
 pipe_channel:
-	gcc ./src/pipe_channel/*.c && ./a.out
+	$(MAKE) pipe_channel.o && ./pipe_channel.o
+
+%.o:src/%
+	$(CC) ./$</*.c -o $@

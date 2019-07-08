@@ -52,21 +52,6 @@ pid_list_t * store_pid() {
     return pid_item;
 }
 
-
-pipe_channel_t* fork_with_pipe_channel() {
-    pid_list_t * pid_item = store_pid();
-
-    pipe_channel_t * pipe_channel = create_pipe_channel(&pid_item->pid);
-
-    if ((pid_item->pid = fork()) == -1) {
-        perror("fork");
-        exit(1);
-    }
-
-    init_pipe_channel(pipe_channel);
-    return pipe_channel;
-}
-
 void init_pipe_channel(pipe_channel_t* pipe_channel) {
     int *pid = pipe_channel->pid;
     channel_t channel = pipe_channel->channel;
@@ -83,6 +68,20 @@ void init_pipe_channel(pipe_channel_t* pipe_channel) {
         // write only
         close(channel[0][0]);
     }
+}
+
+pipe_channel_t* fork_with_pipe_channel() {
+    pid_list_t * pid_item = store_pid();
+
+    pipe_channel_t * pipe_channel = create_pipe_channel(&pid_item->pid);
+
+    if ((pid_item->pid = fork()) == -1) {
+        perror("fork");
+        exit(1);
+    }
+
+    init_pipe_channel(pipe_channel);
+    return pipe_channel;
 }
 
 int read_pipe_channel(pipe_channel_t* pipe_channel, char * buffer, int size) {

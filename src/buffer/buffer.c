@@ -28,34 +28,28 @@ int readInt8(Buffer buffer, long offset) {
     return buffer.arrayByffer[offset];
 }
 
-short int readInt16(Buffer buffer, long offset) {
-    short int* num = (short int *) (&buffer.arrayByffer[offset]);
-    return *num;
+short readInt16(Buffer buffer, long offset) {
+    return *(short *) (&buffer.arrayByffer[offset]);
 }
 
-short int readInt32(Buffer buffer, long offset) {
-    int* num = (int *) (&buffer.arrayByffer[offset]);
-    return *num;
+int readInt32(Buffer buffer, long offset) {
+    return *(int *) (&buffer.arrayByffer[offset]);
 }
 
-short int readInt64(Buffer buffer, long offset) {
-    long int* num = (long int *) (&buffer.arrayByffer[offset]);
-    return *num;
+long readInt64(Buffer buffer, long offset) {
+    return *(long *) (&buffer.arrayByffer[offset]);
 }
 
-short int readUInt16(Buffer buffer, long offset) {
-    unsigned short int* num = (unsigned short int *) (&buffer.arrayByffer[offset]);
-    return *num;
+unsigned short readUInt16(Buffer buffer, long offset) {
+    return *(unsigned short *) (&buffer.arrayByffer[offset]);
 }
 
-short int readUInt32(Buffer buffer, long offset) {
-    unsigned int* num = (unsigned int *) (&buffer.arrayByffer[offset]);
-    return *num;
+unsigned int readUInt32(Buffer buffer, long offset) {
+    return *(unsigned int *) (&buffer.arrayByffer[offset]);
 }
 
-short int readUInt64(Buffer buffer, long offset) {
-    unsigned long int* num = (unsigned long int *) (&buffer.arrayByffer[offset]);
-    return *num;
+unsigned long readUInt64(Buffer buffer, long offset) {
+    return *(unsigned long *) (&buffer.arrayByffer[offset]);
 }
 
 void readBytes(Buffer buffer, void (*fn)(int byte, long index)) {
