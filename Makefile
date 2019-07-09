@@ -38,7 +38,9 @@ fd:
 pipe-example:
 	gcc ./c-features/pipe/example.c && ./a.out
 
-
+so: 
+	@gcc -fPIC -shared ./c-features/so/*.c -o libhello.so
+	@gcc ./c-features/so/main.c -L. -lhello
 
 # Some wheels
 assert:
@@ -53,5 +55,5 @@ event:
 pipe_channel:
 	$(MAKE) pipe_channel.o && ./pipe_channel.o
 
-%.o:src/%
-	$(CC) ./$</*.c -o $@
+# %.o:src/%
+# 	$(CC) ./$</*.c -o $@
