@@ -19,6 +19,7 @@ int main(void)
         {
             write_pipe_channel(pipe_channel, new_buffer[i], strlen(new_buffer[i]));
         }
+        end_pipe_channel(pipe_channel);
         close_pipe_channel(pipe_channel);
         exit(0);
     } else if (pid > 0)
@@ -30,12 +31,16 @@ int main(void)
             write_pipe_channel(pipe_channel, buffer[i], strlen(buffer[i]));
         }
 
-        close_pipe_channel(pipe_channel);
+        end_pipe_channel(pipe_channel);
         wait(NULL);
 
         char * res = read_until_end(pipe_channel);
 
         printf("\nmessage from parent:\n\n%s", res);
+
+        close_pipe_channel(pipe_channel);
+
+        exit(0);
     }
 
     return 0;

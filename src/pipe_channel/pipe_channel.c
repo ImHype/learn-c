@@ -6,15 +6,6 @@
 #include <sys/types.h>
 #include "pipe_channel.h"
 
-typedef struct linked_list {
-    pid_tt pid;
-    struct linked_list* next;
-} linked_list;
-
-typedef linked_list pid_list_t;
-
-pid_list_t pid_list = {-1, NULL};
-
 pipe_channel_t* create_pipe_channel(pid_tt * pid)  {
     int rows = 2;
     int **channel = (int **) malloc(rows * sizeof(int *));
@@ -37,21 +28,6 @@ pipe_channel_t* create_pipe_channel(pid_tt * pid)  {
     return pipe_channel;
 }
 
-pid_list_t * store_pid() {
-    pid_list_t * temp_list = &pid_list;
-
-    while (temp_list->next != NULL)
-    {
-        temp_list = temp_list->next;
-    }
-
-    pid_list_t * pid_item = (pid_list_t *) malloc(sizeof(pid_list_t));
-
-    temp_list->next = pid_item;
-
-    return pid_item;
-}
-
 void init_pipe_channel(pipe_channel_t* pipe_channel) {
     int *pid = pipe_channel->pid;
     channel_t channel = pipe_channel->channel;
@@ -71,11 +47,11 @@ void init_pipe_channel(pipe_channel_t* pipe_channel) {
 }
 
 pipe_channel_t* fork_with_pipe_channel() {
-    pid_list_t * pid_item = store_pid();
+    int * pid = (int *) malloc(sizeof(int));
 
-    pipe_channel_t * pipe_channel = create_pipe_channel(&pid_item->pid);
+    pipe_channel_t * pipe_channel = create_pipe_channel(pid);
 
-    if ((pid_item->pid = fork()) == -1) {
+    if ((*pid = fork()) == -1) {
         perror("fork");
         exit(1);
     }
@@ -111,10 +87,18 @@ void write_pipe_channel(pipe_channel_t* pipe_channel, char * buffer, int size) {
     write(get_pipe_channel_fd(pipe_channel), buffer, size);
 }
 
-void close_pipe_channel(pipe_channel_t* pipe_channel) {
+void end_pipe_channel(pipe_channel_t* pipe_channel) {
     close(get_pipe_channel_fd(pipe_channel));
 }
 
+
+void close_pipe_channel(pipe_channel_t* pipe_channel) {
+    end_pipe_channel(pipe_channel);
+
+    free(pipe_channel->channel);
+    free(pipe_channel->pid);
+    free(pipe_channel);
+}
 
 #define CHUNK_SIZE 4
 
