@@ -42,6 +42,9 @@ so:
 	@gcc -fPIC -shared ./c-features/so/*.c -o libhello.so
 	@gcc ./c-features/so/main.c -L. -lhello
 
+gdb:
+	gcc -g ./c-features/gdb/main.c && ./a.out
+
 # Some wheels
 assert:
 	@$(MAKE) assert.o && ./assert.o
