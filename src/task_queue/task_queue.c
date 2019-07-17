@@ -7,10 +7,17 @@
 #include "./task_queue.h"
 
 sem_t * sem;
+sem_t * mutex;
 tasks_t pending;
 tasks_t done;
 pthread_t pthread;
 
+
+#define INIT_SEM(sem) sem_open(sem, O_CREAT, 0777, 0)
+
+#define INIT_MUTEX(mutex) sem_open(mutex, O_CREAT, 0777, 1)
+#define LOCK(mutex) (sem_wait(mutex))
+#define UN_LOCK(mutex) (sem_post(mutex))
 
 int pipefds[2];
 
@@ -41,14 +48,18 @@ void* task_worker(void * arg) {
     {
         sem_wait(sem);
 
+        LOCK(mutex);
         task = tasks->task;
-
         tasks->task = task->next;
         task->next = NULL;
+        UN_LOCK(mutex);
+        
+        void * result = task->work(task->req);
 
-        task->result = task->work(task->req);
-
+        LOCK(mutex);
+        task->result = result;
         push_queue(done, task);
+        UN_LOCK(mutex);
 
         write(tasks->pipefds[1], " ", 1);
     }
@@ -85,7 +96,8 @@ task_queue_t * init_task_queue() {
     task_queue->pending = init_task(pipefds);
     task_queue->done =  init_task(pipefds);
 
-    sem = sem_open("sem", O_CREAT, 0777, 0);
+    sem = INIT_SEM("sem");
+    mutex = INIT_MUTEX("mutex");
 
     init_threads(task_queue);
 
@@ -105,7 +117,9 @@ int add_task(task_queue_t * task_queue, function_t work, function_t cb, void* re
 
     task_queue->active_handles ++;
 
+    LOCK(mutex);
     push_queue(tasks, crt_task);
+    UN_LOCK(mutex);
 
     sem_post(sem);
 
@@ -122,16 +136,23 @@ int run_task_queue(task_queue_t * task_queue) {
     while (task_queue->active_handles > 0)
     {
         read(tasks->pipefds[0], buf, 1);
+        
         task_t * task = done->task;
+
+        task_t * ptask = task;
 
         while (task != NULL)
         {
             task->cb(task);
             task_queue->active_handles --;
+
+            ptask = task;
             task = task->next;
+
+            free(ptask);
         }
 
-        done->task = NULL;
+        done->task = task;
     }
     
     return 0;
