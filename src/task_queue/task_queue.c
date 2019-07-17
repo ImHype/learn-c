@@ -14,7 +14,7 @@ pthread_t pthread;
 
 int pipefds[2];
 
-int push_task(tasks_t * tasks, task_t * task) {
+int push_queue(tasks_t * tasks, task_t * task) {
     task_t * new_task = tasks->task;
 
     if (new_task == NULL) {
@@ -24,7 +24,6 @@ int push_task(tasks_t * tasks, task_t * task) {
         {
             new_task = new_task->next;
         }
-
         new_task->next = task;
     }
 
@@ -32,10 +31,10 @@ int push_task(tasks_t * tasks, task_t * task) {
 }
 
   
-void* thread_main(void * arg) { 
-    tasks_info_t * tasks_info = arg;
-    tasks_t *tasks = tasks_info->pending;
-    tasks_t *done = tasks_info->done;
+void* task_worker(void * arg) { 
+    task_queue_t * task_queue = arg;
+    tasks_t *tasks = task_queue->pending;
+    tasks_t *done = task_queue->done;
     task_t * task;
 
     while (1)
@@ -47,9 +46,9 @@ void* thread_main(void * arg) {
         tasks->task = task->next;
         task->next = NULL;
 
-        task->result = task->work(task->argv);
+        task->result = task->work(task->req);
 
-        push_task(done, task);
+        push_queue(done, task);
 
         write(tasks->pipefds[1], " ", 1);
     }
@@ -57,57 +56,56 @@ void* thread_main(void * arg) {
     return 0;
 }
 
-int init_threads(tasks_info_t * task_info) {
+int init_threads(task_queue_t * task_queue) {
     int thread_size = 4;
 
     for (int i = 0; i < thread_size; i++) {
-        pthread_create(&pthread, NULL, thread_main, task_info); 
+        pthread_create(&pthread, NULL, task_worker, task_queue); 
         printf("thread(%d) started\n", i);
     }
 
     return 0;
 }
 
-tasks_info_t * init_tasks() {
-    int * pipefds = (int *) malloc(sizeof(int) * 2);
-
-    tasks_info_t * task_info = (tasks_info_t *) malloc(sizeof(tasks_info_t));
-
+tasks_t * init_task(int * pipefds) {
     tasks_t * tasks = (tasks_t *) malloc(sizeof(tasks_t));
-    tasks_t * done = (tasks_t *) malloc(sizeof(tasks_t));
-
-    tasks->pipefds = pipefds;
-    done->pipefds = pipefds;
-
-    done->task = NULL;
     tasks->task = NULL;
+    tasks->pipefds = pipefds;
 
-    task_info->pending = tasks;
-    task_info->done = done;
+    return tasks;
+}
 
-    pipe(tasks->pipefds);
+task_queue_t * init_task_queue() {
+    int * pipefds = (int *) malloc(sizeof(int) * 2);
+    pipe(pipefds);
+
+    task_queue_t * task_queue = (task_queue_t *) malloc(sizeof(task_queue_t));
+
+    task_queue->active_handles = 0;
+    task_queue->pending = init_task(pipefds);
+    task_queue->done =  init_task(pipefds);
 
     sem = sem_open("sem", O_CREAT, 0777, 0);
 
-    init_threads(task_info);
+    init_threads(task_queue);
 
-    return task_info;
+    return task_queue;
 }
 
-
-
-int add_task(tasks_info_t * tasks_info, function_t work, function_t cb, void* argv) {
-    tasks_t * tasks = tasks_info->pending;
+int add_task(task_queue_t * task_queue, function_t work, function_t cb, void* req) {
+    tasks_t * tasks = task_queue->pending;
 
     task_t * crt_task = (task_t *) malloc(sizeof(task_t));
 
     crt_task->cb = cb;
     crt_task->work = work;
-    crt_task->argv = argv;
+    crt_task->req = req;
     crt_task->next = NULL;
     crt_task->result = NULL;
 
-    push_task(tasks, crt_task);
+    task_queue->active_handles ++;
+
+    push_queue(tasks, crt_task);
 
     sem_post(sem);
 
@@ -115,20 +113,21 @@ int add_task(tasks_info_t * tasks_info, function_t work, function_t cb, void* ar
 }
 
 
-int run_tasks(tasks_info_t * tasks_info) {
-    tasks_t * tasks = tasks_info->pending;
-    tasks_t * done = tasks_info->done;
+int run_task_queue(task_queue_t * task_queue) {
+    tasks_t * tasks = task_queue->pending;
+    tasks_t * done = task_queue->done;
 
     char buf[1] = "";
 
-    while (1)
+    while (task_queue->active_handles > 0)
     {
         read(tasks->pipefds[0], buf, 1);
         task_t * task = done->task;
 
         while (task != NULL)
         {
-            task->cb(task->result);
+            task->cb(task);
+            task_queue->active_handles --;
             task = task->next;
         }
 

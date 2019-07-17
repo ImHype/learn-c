@@ -1,42 +1,35 @@
-# task_queue
+# Task queue
 ## Description
 
 It's a queue who could make your operations non-blocking.
 
-## quick start
+## Quick start
 
-### define worker
+### Define worker
 ```c
-void* work(void* _argv) {
-    task_argv_t * argv = _argv;
+void* read_file(void* _argv) {
+    task_req_t * argv = _argv;
     printf("%s\n", argv->data);
 
-    char * type = argv->type;
-    char * name = argv->name;
+    int fd = open((char *) argv->data, O_RDONLY);
 
-    if (strcmp(type, "fs") == 0) {
-        int fd = open((char *) argv->data, O_RDONLY);
+    int size = 0;
 
-        if (strcmp(name, "read") == 0) {
-            int size = 0;
-
-            char * buf = (char *) malloc(500 * sizeof(char));
-            char chunk[1024] = "";
-            int chunkSize = sizeof(chunk);
-            
-            while ((size = read(fd, chunk, chunkSize)) > 0) {
-                strcat(buf, chunk);
-            }
-
-            return buf;
-        }
+    char * buf = (char *) malloc(500 * sizeof(char));
+    char chunk[1024] = "";
+    int chunkSize = sizeof(chunk);
+    
+    while ((size = read(fd, chunk, chunkSize)) > 0) {
+        strcat(buf, chunk);
     }
+
+    return buf;
 
     return 0;
 }
 ```
 
-### define callback
+### Define callback
 ```c
 void* callback(void* argv) {
     char * buf = argv;
@@ -45,27 +38,20 @@ void* callback(void* argv) {
 }
 ```
 
-### define main
+### Define main
 ```c
 int main() 
 { 
-    tasks_info_t * tasks_info = init_tasks();
+    task_queue_t * tasks_queue = init_task_queue();
     
-    task_argv_t argv = {
-        "fs",
-        "read",
-        "/Users/xujunyu.joey/learn-series/learn-c/README.md"};
+    task_req_t * req1 = init_fs_req("/Users/xujunyu.joey/learn-series/learn-c/README.md");
+    task_req_t * req2 = init_fs_req("/Users/xujunyu.joey/learn-series/learn-c/Makefile");
 
-    task_argv_t argv2 = {
-        "fs",
-        "read",
-        "/Users/xujunyu.joey/learn-series/learn-c/Makefile"
-    };
+    add_task(tasks_queue, &read_file, &callback, req1);
+    add_task(tasks_queue, &read_file, &callback, req2);
 
-    add_task(tasks_info, &work, &callback, &argv);
-    add_task(tasks_info, &work, &callback, &argv2);
-
-    run_tasks(tasks_info);
+    run_task_queue(tasks_queue);
     return 0; 
 } 
+ 
 ```

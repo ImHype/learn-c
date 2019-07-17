@@ -1,22 +1,10 @@
 // C program to demonstrate working of Semaphores 
 typedef void* (*function_t)(void *);
 
-#define ARGV \
-    char * type; \
-    char * name; \
-    char * data; 
-
-typedef struct task_argv_t {
-    ARGV
-} task_argv_t;
-
-typedef struct init_tasks_argv_t {
-    int * pipefds;
-} init_tasks_argv_t;
 
 typedef struct task_t
 {
-    void * argv;
+    void * req;
     function_t work;
     function_t cb;
 
@@ -31,15 +19,15 @@ typedef struct tasks_t {
     task_t * task;
 } tasks_t;
 
-typedef struct tasks_info_t
+typedef struct task_queue_t
 {
     tasks_t * pending;
     tasks_t * done;
-} tasks_info_t;
+    int active_handles;
+} task_queue_t;
 
+task_queue_t * init_task_queue();
 
-tasks_info_t * init_tasks();
+int add_task(task_queue_t * tasks_info, function_t work, function_t cb, void* req);
 
-int add_task(tasks_info_t * tasks_info, function_t work, function_t cb, void* argv);
-
-int run_tasks(tasks_info_t * tasks_info);
+int run_task_queue(task_queue_t * tasks_info);
