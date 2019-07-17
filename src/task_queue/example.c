@@ -18,7 +18,7 @@ typedef struct task_req_t {
 
 void* read_file(void* _argv) {
     task_req_t * argv = _argv;
-    printf("%s\n", argv->data);
+    printf("reading[filename=%s]\n", argv->data);
 
     int fd = open((char *) argv->data, O_RDONLY);
 
@@ -31,6 +31,8 @@ void* read_file(void* _argv) {
     while ((size = read(fd, chunk, chunkSize)) > 0) {
         strcat(buf, chunk);
     }
+
+    close(fd);
 
     return buf;
 }
@@ -53,11 +55,12 @@ int main()
 { 
     task_queue_t * tasks_queue = init_task_queue();
     
-    task_req_t * req1 = init_fs_req("./fixtures/content.txt");
-    task_req_t * req2 = init_fs_req("./fixtures/content-2.txt");
+    task_req_t * req2 = init_fs_req("/Users/xujunyu.joey/learn-series/learn-c/src/task_queue/fixtures/content-2.txt");
 
-    add_task(tasks_queue, &read_file, &callback, req1);
-    add_task(tasks_queue, &read_file, &callback, req2);
+    for (int i = 0; i < 10; i++) {
+        task_req_t * req1 = init_fs_req("/Users/xujunyu.joey/learn-series/learn-c/src/task_queue/fixtures/content.txt");
+        add_task(tasks_queue, &read_file, &callback, req1);
+    }
 
     run_task_queue(tasks_queue);
     return 0; 
