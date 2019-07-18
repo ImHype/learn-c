@@ -12,50 +12,36 @@ tasks_t pending;
 tasks_t done;
 pthread_t pthread;
 
-#define INIT_SEM(sem) sem_open(sem, O_CREAT, 0777, 0)
-
-#define INIT_MUTEX(mutex) sem_open(mutex, O_CREAT, 0777, 1)
-        
 #define LOCK() sem_wait(mutex);
-
 #define UN_LOCK() (sem_post(mutex))
 
+int id = 0;
 int pipefds[2];
 
 int push_queue(tasks_t * tasks, task_t * task) {
     task_t * new_task = tasks->task;
 
-    LOCK();
-
     if (new_task == NULL) {
         tasks->task = task;
     } else {
-        // if (task->next == NULL) {
-     
-        // } else {
-        //     printf("task has next\n");
-        // }
         while (new_task->next != NULL)
         {
             new_task = new_task->next;
         }
+
         new_task->next = task;
     }
     tasks->active_handles ++;
-
-    UN_LOCK();
     return 0;
 }
 
 task_t * pop_queue(tasks_t * tasks) {
-    LOCK();
 
     task_t * task = tasks->task;
     tasks->task = task->next;
     task->next = NULL;
     tasks->active_handles --;
-
-    UN_LOCK();
+   
     return task;
 }
 
@@ -71,12 +57,17 @@ void* run_task(void * arg) {
     {
         sem_wait(sem);
 
+        LOCK();
         task = pop_queue(tasks);
-    
-        task->result = task->work(task->req);
-        push_queue(done, task);
 
-        write(tasks->pipefds[1], " ", 1);
+        printf("task excuting=%d\n", task->id);
+        task->result = task->work(task->req);
+        printf("task ended=%d\n", task->id);
+
+        push_queue(done, task);
+        UN_LOCK();
+
+        write(tasks->pipefds[1], "h", 2);
     }
 
     return 0;
@@ -116,7 +107,7 @@ task_queue_t * init_task_queue() {
     sem = sem_open("sem", O_CREAT, 0777, 0);
 
     sem_unlink("mutex");
-    mutex = sem_open("mutex", O_CREAT, 0777, 1);
+    sem_open("mutex", O_CREAT, 0777, 1);
 
     init_threads(task_queue);
 
@@ -132,8 +123,11 @@ int add_task(task_queue_t * task_queue, function_t work, function_t cb, void* re
     crt_task->req = req;
     crt_task->next = NULL;
     crt_task->result = NULL;
+    crt_task->id = id++;
 
+    LOCK();
     push_queue(tasks, crt_task);
+    UN_LOCK();
 
     sem_post(sem);
 
@@ -149,17 +143,20 @@ int run_task_queue(task_queue_t * task_queue) {
 
     while (tasks->active_handles > 0)
     {
-        read(tasks->pipefds[0], buf, 1);
-        
+        read(tasks->pipefds[0], buf, sizeof(buf));
+        printf("read\n");
         task_t * task = done->task;
 
         while (done->task != NULL)
         {
+            LOCK();
             task = pop_queue(done);
+            UN_LOCK();
             task->cb(task);
+
             free(task);
         }
     }
-    
+
     return 0;
 }

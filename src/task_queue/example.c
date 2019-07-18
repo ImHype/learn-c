@@ -57,9 +57,9 @@ int main()
     
     task_req_t * req2 = init_fs_req("/Users/xujunyu.joey/learn-series/learn-c/src/task_queue/fixtures/content-2.txt");
 
-    for (int i = 0; i < 10; i++) {
-        task_req_t * req1 = init_fs_req("/Users/xujunyu.joey/learn-series/learn-c/src/task_queue/fixtures/content.txt");
-        add_task(tasks_queue, &read_file, &callback, req1);
+    for (int i = 0; i < 100; i++) {
+        task_req_t * req = init_fs_req("/Users/xujunyu.joey/learn-series/learn-c/src/task_queue/fixtures/content.txt");
+        add_task(tasks_queue, &read_file, &callback, req);
     }
 
     run_task_queue(tasks_queue);

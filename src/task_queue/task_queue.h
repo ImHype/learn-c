@@ -5,6 +5,7 @@ typedef void* (*function_t)(void *);
 
 typedef struct task_t
 {
+    int id;
     void * req;
     function_t work;
     function_t cb;
@@ -12,7 +13,7 @@ typedef struct task_t
     void * result;
 
     struct task_t * next;
-    
+
 } task_t;
 
 typedef struct tasks_t {
