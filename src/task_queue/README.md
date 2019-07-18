@@ -3,6 +3,21 @@
 
 It's a queue who could make your operations non-blocking.
 
+### MAKE .so
+```sh
+$ make libtask_queue.so
+```
+
+### MAKE main_process
+```sh
+$ make main_process.o
+```
+
+### RUN
+```sh
+$ ./main_process.o
+```
+
 ## Quick start
 
 ### Define worker
@@ -17,9 +32,9 @@ void* read_file(void* _argv) {
 
     char * buf = (char *) malloc(500 * sizeof(char));
     char chunk[1024] = "";
-    int chunkSize = sizeof(chunk);
+    int chunk_size = sizeof(chunk);
     
-    while ((size = read(fd, chunk, chunkSize)) > 0) {
+    while ((size = read(fd, chunk, chunk_size)) > 0) {
         strcat(buf, chunk);
     }
 

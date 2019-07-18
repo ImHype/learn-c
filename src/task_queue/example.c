@@ -25,10 +25,9 @@ void* read_file(void* _argv) {
     int size = 0;
 
     char * buf = (char *) malloc(500 * sizeof(char));
-    char chunk[1024] = "";
-    int chunkSize = sizeof(chunk);
+    char chunk[1024];
     
-    while ((size = read(fd, chunk, chunkSize)) > 0) {
+    while ((size = read(fd, chunk, sizeof(chunk))) > 0) {
         strcat(buf, chunk);
     }
 
@@ -57,7 +56,7 @@ int main()
     
     task_req_t * req2 = init_fs_req("/Users/xujunyu.joey/learn-series/learn-c/src/task_queue/fixtures/content-2.txt");
 
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 10000; i++) {
         task_req_t * req = init_fs_req("/Users/xujunyu.joey/learn-series/learn-c/src/task_queue/fixtures/content.txt");
         add_task(tasks_queue, &read_file, &callback, req);
     }

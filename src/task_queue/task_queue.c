@@ -7,13 +7,15 @@
 #include "./task_queue.h"
 
 sem_t * sem;
-sem_t * mutex;
+// sem_t * mutex;
+pthread_mutex_t mutex;
+
 tasks_t pending;
 tasks_t done;
 pthread_t pthread;
 
-#define LOCK() sem_wait(mutex);
-#define UN_LOCK() sem_post(mutex);
+#define LOCK() pthread_mutex_lock(&mutex);
+#define UN_LOCK() pthread_mutex_unlock(&mutex);
 
 int id = 0;
 int pipefds[2];
@@ -59,15 +61,17 @@ void* run_task(void * arg) {
 
         LOCK();
         task = pop_queue(tasks);
+        UN_LOCK();
 
         printf("task excuting=%d\n", task->id);
         task->result = task->work(task->req);
         printf("task ended=%d\n", task->id);
 
+        LOCK();
         push_queue(done, task);
         UN_LOCK();
 
-        write(tasks->pipefds[1], "h", 2);
+        write(tasks->pipefds[1], " ", 1);
     }
 
     return 0;
@@ -106,8 +110,7 @@ task_queue_t * init_task_queue() {
     sem_unlink("sem");
     sem = sem_open("sem", O_CREAT, 0777, 0);
 
-    sem_unlink("mutex");
-    sem_open("mutex", O_CREAT, 0777, 1);
+    pthread_mutex_init(&mutex, 0);
 
     init_threads(task_queue);
 
@@ -144,8 +147,9 @@ int run_task_queue(task_queue_t * task_queue) {
     while (tasks->active_handles > 0)
     {
         read(tasks->pipefds[0], buf, sizeof(buf));
-        printf("read\n");
         task_t * task = done->task;
+
+        printf("Reading the message from fd\n");
 
         while (done->task != NULL)
         {
