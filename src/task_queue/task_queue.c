@@ -3,7 +3,12 @@
 #include <pthread.h> 
 #include <semaphore.h> 
 #include <stdlib.h>
+#include <stdio.h>
 #include <unistd.h>
+#include <errno.h>
+#include <string.h>
+
+
 #include "./task_queue.h"
 
 sem_t * sem;
@@ -63,9 +68,15 @@ void* run_task(void * arg) {
         task = pop_queue(tasks);
         UN_LOCK();
 
-        printf("task excuting=%d\n", task->id);
+        // printf("task excuting=%d\n", task->id);
+        errno = 0;
         task->result = task->work(task->req);
-        printf("task ended=%d\n", task->id);
+
+        if (errno != 0) {
+            task->error = errno;
+        }
+
+        // printf("task ended=%d\n", task->id);
 
         LOCK();
         push_queue(done, task);
@@ -127,6 +138,7 @@ int add_task(task_queue_t * task_queue, function_t work, function_t cb, void* re
     crt_task->next = NULL;
     crt_task->result = NULL;
     crt_task->id = id++;
+    crt_task->error = 0;
 
     LOCK();
     push_queue(tasks, crt_task);
@@ -148,8 +160,6 @@ int run_task_queue(task_queue_t * task_queue) {
     {
         read(tasks->pipefds[0], buf, sizeof(buf));
         task_t * task = done->task;
-
-        printf("Reading the message from fd\n");
 
         while (done->task != NULL)
         {

@@ -22,6 +22,10 @@ void* read_file(void* _argv) {
 
     int fd = open((char *) argv->data, O_RDONLY);
 
+    if (fd < 0) {
+        return 0;
+    }
+
     int size = 0;
 
     char * buf = (char *) malloc(500 * sizeof(char));
@@ -40,7 +44,12 @@ void* callback(void* argv) {
     task_t * task = (task_t *) argv;
     task_req_t * req = task->req;
 
-    printf("filename=%s, content=%s\n", req->data, task->result);
+    if (task->error) {
+        printf("[%d] filename=%s, error=%s\n", task->id, req->data, strerror(task->error));
+    } else {
+        printf("[%d] filename=%s, content=%s\n", task->id, req->data, task->result);
+    }
+
     return 0;
 }
 
@@ -54,10 +63,8 @@ int main()
 { 
     task_queue_t * tasks_queue = init_task_queue();
     
-    task_req_t * req2 = init_fs_req("/Users/xujunyu.joey/learn-series/learn-c/src/task_queue/fixtures/content-2.txt");
-
-    for (int i = 0; i < 10000; i++) {
-        task_req_t * req = init_fs_req("/Users/xujunyu.joey/learn-series/learn-c/src/task_queue/fixtures/content.txt");
+    for (int i = 0; i < 10; i++) {
+        task_req_t * req = init_fs_req("/Users/xujunyu.joey/learn-series/learn-c/src/task_queue/fixtures/content1.txt");
         add_task(tasks_queue, &read_file, &callback, req);
     }
 

@@ -11,6 +11,7 @@ typedef struct task_t
     function_t cb;
 
     void * result;
+    int error;
 
     struct task_t * next;
 
