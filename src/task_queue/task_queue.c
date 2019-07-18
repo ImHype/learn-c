@@ -13,7 +13,7 @@ tasks_t done;
 pthread_t pthread;
 
 #define LOCK() sem_wait(mutex);
-#define UN_LOCK() (sem_post(mutex))
+#define UN_LOCK() sem_post(mutex);
 
 int id = 0;
 int pipefds[2];
