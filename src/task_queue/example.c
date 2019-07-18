@@ -68,6 +68,11 @@ int main()
         add_task(tasks_queue, &read_file, &callback, req);
     }
 
+    for (int i = 0; i < 100000; i++) {
+        task_req_t * req = init_fs_req("/Users/xujunyu.joey/learn-series/learn-c/src/task_queue/fixtures/content.txt");
+        add_task(tasks_queue, &read_file, &callback, req);
+    }
+
     run_task_queue(tasks_queue);
     return 0; 
 } 
