@@ -9,11 +9,9 @@ enum course_t {
 
 typedef enum course_t course_tt;
 
-
 #define BASE_DATA \
     char * name; \
     int age;
-
 
 typedef struct {
     BASE_DATA;
