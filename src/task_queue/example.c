@@ -17,10 +17,10 @@ typedef struct task_req_t {
 
 
 void* read_file(void* _argv) {
-    task_req_t * argv = _argv;
-    printf("reading[filename=%s]\n", argv->data);
+    task_req_t * req = _argv;
+    printf("reading[filename=%s]\n", req->data);
 
-    int fd = open((char *) argv->data, O_RDONLY);
+    int fd = open((char *) req->data, O_RDONLY);
 
     if (fd < 0) {
         return 0;
@@ -30,7 +30,7 @@ void* read_file(void* _argv) {
 
     char * buf = (char *) malloc(500 * sizeof(char));
     char chunk[1024];
-    
+
     while ((size = read(fd, chunk, sizeof(chunk))) > 0) {
         strcat(buf, chunk);
     }
@@ -59,20 +59,38 @@ task_req_t * init_fs_req(char * path) {
     return req;
 }
   
-int main() 
-{ 
+int run_one_task() {
+    task_queue_t * tasks_queue = init_task_queue();
+    task_req_t * req = init_fs_req("/Users/xujunyu.joey/learn-series/learn-c/src/task_queue/fixtures/content.txt");
+
+    task_t * task = init_task(&read_file, &callback, req);
+    task_t * task2 = init_task(&read_file, &callback, req);
+    
+    add_task(tasks_queue, task);
+    run_task_queue(tasks_queue);
+    return 0; 
+}
+
+int run_tasks() {
     task_queue_t * tasks_queue = init_task_queue();
     
-    for (int i = 0; i < 10; i++) {
-        task_req_t * req = init_fs_req("/Users/xujunyu.joey/learn-series/learn-c/src/task_queue/fixtures/content1.txt");
-        add_task(tasks_queue, &read_file, &callback, req);
+    for (int i = 0; i < 1000; i++) {
+        task_req_t * req = init_fs_req("/Users/xujunyu.joey/learn-series/learn-c/src/task_queue/fixtures/content.txt");
+        task_t * task = init_task(&read_file, &callback, req);
+        add_task(tasks_queue, task);
     }
 
-    for (int i = 0; i < 100000; i++) {
+    for (int i = 0; i < 1000; i++) {
         task_req_t * req = init_fs_req("/Users/xujunyu.joey/learn-series/learn-c/src/task_queue/fixtures/content.txt");
-        add_task(tasks_queue, &read_file, &callback, req);
+        task_t * task = init_task(&read_file, &callback, req);
+        add_task(tasks_queue, task);
     }
 
     run_task_queue(tasks_queue);
     return 0; 
-} 
+}
+
+int main() 
+{ 
+    return run_tasks();
+}

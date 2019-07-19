@@ -38,7 +38,6 @@ int push_queue(tasks_t * tasks, task_t * task) {
 
         new_task->next = task;
     }
-    tasks->active_handles ++;
     return 0;
 }
 
@@ -47,7 +46,6 @@ task_t * pop_queue(tasks_t * tasks) {
     task_t * task = tasks->task;
     tasks->task = task->next;
     task->next = NULL;
-    tasks->active_handles --;
    
     return task;
 }
@@ -68,7 +66,6 @@ void* run_task(void * arg) {
         task = pop_queue(tasks);
         UN_LOCK();
 
-        // printf("task excuting=%d\n", task->id);
         errno = 0;
         task->result = task->work(task->req);
 
@@ -76,9 +73,9 @@ void* run_task(void * arg) {
             task->error = errno;
         }
 
-        // printf("task ended=%d\n", task->id);
-
         LOCK();
+        task_queue->active_handles --;
+
         push_queue(done, task);
         UN_LOCK();
 
@@ -99,12 +96,11 @@ int init_threads(task_queue_t * task_queue) {
     return 0;
 }
 
-tasks_t * init_task(int * pipefds) {
+tasks_t * init_tasks(int * pipefds) {
     tasks_t * tasks = (tasks_t *) malloc(sizeof(tasks_t));
 
     tasks->task = NULL;
     tasks->pipefds = pipefds;
-    tasks->active_handles = 0;
 
     return tasks;
 }
@@ -115,8 +111,9 @@ task_queue_t * init_task_queue() {
 
     task_queue_t * task_queue = (task_queue_t *) malloc(sizeof(task_queue_t));
 
-    task_queue->pending = init_task(pipefds);
-    task_queue->done =  init_task(pipefds);
+    task_queue->pending = init_tasks(pipefds);
+    task_queue->done =  init_tasks(pipefds);
+    task_queue->active_handles = 0;
 
     sem_unlink("sem");
     sem = sem_open("sem", O_CREAT, 0777, 0);
@@ -128,20 +125,26 @@ task_queue_t * init_task_queue() {
     return task_queue;
 }
 
-int add_task(task_queue_t * task_queue, function_t work, function_t cb, void* req) {
-    tasks_t * tasks = task_queue->pending;
-    task_t * crt_task = (task_t *) malloc(sizeof(task_t));
+task_t * init_task(function_t work, function_t cb, void* req) {
+    task_t * task = (task_t *) malloc(sizeof(task_t));
 
-    crt_task->cb = cb;
-    crt_task->work = work;
-    crt_task->req = req;
-    crt_task->next = NULL;
-    crt_task->result = NULL;
-    crt_task->id = id++;
-    crt_task->error = 0;
+    task->cb = cb;
+    task->work = work;
+    task->req = req;
+    task->next = NULL;
+    task->result = NULL;
+    task->id = id++;
+    task->error = 0;
+
+    return task;
+}
+
+int add_task(task_queue_t * task_queue, task_t * task) {
+    tasks_t * tasks = task_queue->pending;
 
     LOCK();
-    push_queue(tasks, crt_task);
+    push_queue(tasks, task);
+    task_queue->active_handles++;
     UN_LOCK();
 
     sem_post(sem);
@@ -156,11 +159,11 @@ int run_task_queue(task_queue_t * task_queue) {
 
     char buf[1] = "";
 
-    while (tasks->active_handles > 0)
+    while (task_queue->active_handles > 0)
     {
         read(tasks->pipefds[0], buf, sizeof(buf));
         task_t * task = done->task;
-
+        
         while (done->task != NULL)
         {
             LOCK();
