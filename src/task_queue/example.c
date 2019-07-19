@@ -4,7 +4,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <stddef.h>
 #include "./task_queue.h"
+
+#define container_of(ptr, type, member) \
+    ((type *) ((char*) ptr - offsetof(type, member)))
 
 #define ARGV \
     char * type; \
@@ -16,9 +20,13 @@ typedef struct task_req_t {
 } task_req_t;
 
 
-void* read_file(void* _argv) {
-    task_req_t * req = _argv;
-    printf("reading[filename=%s]\n", req->data);
+void* read_file(void** _argv) {
+    task_req_t** req_p = (task_req_t**) _argv;
+    task_req_t * req = *req_p;
+
+    task_t * task = container_of(req_p, task_t, req);
+
+    printf("reading[filename=%sid=%d]\n", req->data, task->id);
 
     int fd = open((char *) req->data, O_RDONLY);
 
@@ -74,13 +82,13 @@ int run_one_task() {
 int run_tasks() {
     task_queue_t * tasks_queue = init_task_queue();
     
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 10; i++) {
         task_req_t * req = init_fs_req("/Users/xujunyu.joey/learn-series/learn-c/src/task_queue/fixtures/content.txt");
         task_t * task = init_task(&read_file, &callback, req);
         add_task(tasks_queue, task);
     }
 
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 10; i++) {
         task_req_t * req = init_fs_req("/Users/xujunyu.joey/learn-series/learn-c/src/task_queue/fixtures/content.txt");
         task_t * task = init_task(&read_file, &callback, req);
         add_task(tasks_queue, task);

@@ -67,7 +67,7 @@ void* run_task(void * arg) {
         UN_LOCK();
 
         errno = 0;
-        task->result = task->work(task->req);
+        task->result = task->work(&task->req);
 
         if (errno != 0) {
             task->error = errno;
@@ -125,7 +125,7 @@ task_queue_t * init_task_queue() {
     return task_queue;
 }
 
-task_t * init_task(function_t work, function_t cb, void* req) {
+task_t * init_task(function_p_t work, function_t cb, void* req) {
     task_t * task = (task_t *) malloc(sizeof(task_t));
 
     task->cb = cb;
