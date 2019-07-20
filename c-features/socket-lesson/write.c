@@ -12,7 +12,7 @@ void graceful() {
     exit(0);
 }
 
-char * response = "HTTP/1.1 200 OK\r\nContent-Type: text/html;charset=utf-8\r\nConnection: keep-alive\r\n\r\n<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\" /><title>Document</title></head><body><p>this is http response</p></body></html>";
+char * response = "HTTP/1.1 200 OK\r\nContent-Type: text/html;charset=utf-8\r\n\r\n<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\" /><title>Document</title></head><body><p>this is http response</p></body></html>";
 
 int main(int argc, char const *argv[])
 {
@@ -69,20 +69,6 @@ int main(int argc, char const *argv[])
 
         if (write(client_fd, response, strlen(response)) < 0) {
             perror("write");
-        }
-
-        if (shutdown(client_fd, SHUT_RDWR) < 0) {
-            perror("shutdown");
-        };
-
-        int size = read(client_fd, buf, sizeof(buf));
-
-        if (size == 0) {
-            if (close(client_fd) < 0) {
-                perror("close");
-            }
-        } else if (size < 0) {
-            perror("read");
         }
     }
 

@@ -74,16 +74,7 @@ int main(int argc, char const *argv[])
         if (shutdown(client_fd, SHUT_RDWR) < 0) {
             perror("shutdown");
         };
-
-        int size = read(client_fd, buf, sizeof(buf));
-
-        if (size == 0) {
-            if (close(client_fd) < 0) {
-                perror("close");
-            }
-        } else if (size < 0) {
-            perror("read");
-        }
+        
     }
 
     return 0;

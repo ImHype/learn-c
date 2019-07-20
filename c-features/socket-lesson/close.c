@@ -75,6 +75,7 @@ int main(int argc, char const *argv[])
             perror("shutdown");
         };
 
+
         int size = read(client_fd, buf, sizeof(buf));
 
         if (size == 0) {
