@@ -1,6 +1,7 @@
 #include <stdio.h> 
 #include <sys/types.h> 
 #include <unistd.h> 
+#include <stdlib.h> 
 
 void first() {
     // make two process which run same 
@@ -25,12 +26,16 @@ void pid() {
     int pid = fork();
 
     if (pid) {
-        printf("child process %d", pid);
+        wait(NULL);
+        printf("the process is parent process; and my child process is %d\n", pid);
+    } else {
+        printf("the process is child process\n");
     }
 }
 
 int main() 
 { 
+    printf("main fc only excuted once\n");
     pid();
     return 0; 
 } 

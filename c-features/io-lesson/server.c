@@ -16,9 +16,9 @@ char * response = "HTTP/1.1 200 OK\r\nContent-Type: text/html;charset=utf-8\r\nC
 
 int main(int argc, char const *argv[])
 {
-    signal(SIGHUP, graceful);
-    signal(SIGINT, graceful);
-    signal(SIGQUIT, graceful);
+    // signal(SIGHUP, graceful);
+    // signal(SIGINT, graceful);
+    // signal(SIGQUIT, graceful);
 
     struct sockaddr_in address;
     struct sockaddr_in cliaddr;
@@ -35,7 +35,7 @@ int main(int argc, char const *argv[])
         perror("setsockopt(SO_REUSEADDR) failed");
 
     address.sin_family = AF_INET;
-    address.sin_addr.s_addr = inet_addr("0.0.0.0");
+    address.sin_addr.s_addr = inet_addr("127.0.0.1");
     address.sin_port = htons(9999);
     
     if (bind(socket_fd, (struct sockaddr*)&address,  sizeof(address)) < 0 ) {
@@ -43,8 +43,7 @@ int main(int argc, char const *argv[])
         exit(1);
     };
 
-
-    if (listen(socket_fd, 5) < 0) {
+    if (listen(socket_fd, 1) < 0) {
         perror("listen");
         exit(1);
     }
@@ -62,27 +61,41 @@ int main(int argc, char const *argv[])
         cliaddrlen = sizeof(cliaddr);
 
         char buf[1000];
+        int buf_size;
 
-        read(client_fd, buf, sizeof(buf));
+        while (1) {
+            buf_size = read(client_fd, buf, sizeof(buf));
 
-        printf("req: %s\n", buf);
+            if (buf_size > 0) {
+                printf("req: %s\n", buf);
 
-        if (write(client_fd, response, strlen(response)) < 0) {
-            perror("write");
-        }
+                sleep(3);
 
-        if (shutdown(client_fd, SHUT_RDWR) < 0) {
-            perror("shutdown");
-        };
+                printf("ready write\n");
 
-        int size = read(client_fd, buf, sizeof(buf));
+                int r = write(client_fd, response, strlen(response));
+                printf("write result%d\n", r);
 
-        if (size == 0) {
-            if (close(client_fd) < 0) {
-                perror("close");
+                if (r < 0) {
+                    perror("write");
+                }
+
+                if (shutdown(client_fd, SHUT_RDWR) < 0) {
+                    perror("shutdown");
+                };
+            } else {
+                if (buf_size < 0) {
+                    perror("read");
+                    // int r = write(client_fd, response, strlen(response));
+                    // printf("write result%d\n", r);
+                }
+
+                printf("close fd %d\n", client_fd);
+                if (close(client_fd)) {
+                    perror("close");
+                }
+                break;
             }
-        } else if (size < 0) {
-            perror("read");
         }
     }
 

@@ -1,17 +1,21 @@
-#include<unistd.h> 
-#include<string.h> 
-#include<stdio.h> 
+#include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
 
 int main(int argc, char const *argv[])
 {
     char * str = "hello \n";
-    write(0, str, strlen(str));
-    write(1, str, strlen(str));
-    write(2, str, strlen(str));
 
-    // char str2[3];
-    // read(0, str2, 3);
+    int fd = open("hello.txt", O_WRONLY | O_CREAT, 0666);
 
-    // printf("%s", str2);
+    if (fd < 0) {
+        perror("err1");
+    }
+
+    if (write(fd, str, strlen(str)) < 0) {
+        perror("err2");
+    };
+
     return 0;
 }

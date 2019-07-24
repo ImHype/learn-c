@@ -85,7 +85,7 @@ int main(int argc, char const *argv[])
         exit(1);
     };
 
-    if (listen(socket_fd, 5) < 0) {
+    if (listen(socket_fd, 100) < 0) {
         perror("listen");
         exit(1);
     }
