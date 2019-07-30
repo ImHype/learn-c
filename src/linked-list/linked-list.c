@@ -128,7 +128,7 @@ int linked_list_add_at(linked_list_t * linked_list, int index, void * element) {
     node->next = (*n)->next;
     (*n) = node;
 
-    return 1;
+    return 0;
 };
 
 
@@ -142,7 +142,7 @@ int linked_list_remove_at(linked_list_t * linked_list, int index) {
     while (i < index)
     {
         if (*n == NULL) {
-            return 0;
+            return -1;
         }
 
         n = &(*n)->next;
@@ -155,7 +155,7 @@ int linked_list_remove_at(linked_list_t * linked_list, int index) {
 
     linked_list->length--;
 
-    return 1;
+    return 0;
 };
 
 
