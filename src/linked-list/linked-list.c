@@ -42,22 +42,23 @@ int linked_list_add(linked_list_t * linked_list, void * element) {
 
 
 int linked_list_remove(linked_list_t * linked_list, void * element) {
-    int index = 0;
+    int i = 0;
     node_t ** n;
-    n = &(linked_list->head);
-
     node_t * p;
+    n = &(linked_list->head);
 
     while (*n != NULL)
     {
         if ((*n)->element == element) {
-            (*n) = (*n)->next;
+            p = *n;
+            (*n) = p->next;
+            free(p);
             linked_list->length--;
-            return index;
+            return i;
         }
 
         n = &(*n)->next;
-        index++;
+        i++;
     }
 
     return -1;
@@ -73,9 +74,6 @@ int linked_list_index_of(linked_list_t * linked_list, void * element) {
     int i = 0;
     node_t ** n;
     n = &(linked_list->head);
-
-    node_t * p;
-
 
     while (*n != NULL)
     {
@@ -94,9 +92,8 @@ int linked_list_index_of(linked_list_t * linked_list, void * element) {
 node_t * linked_list_element_at(linked_list_t * linked_list, int index) {
     int i = 0;
     node_t ** n;
-    n = &(linked_list->head);
 
-    node_t * p;
+    n = &(linked_list->head);
 
     while (i < index)
     {
@@ -116,8 +113,6 @@ int linked_list_add_at(linked_list_t * linked_list, int index, void * element) {
     int i = 0;
     node_t ** n;
     n = &(linked_list->head);
-
-    node_t * p;
 
     while (i < index)
     {
@@ -140,9 +135,9 @@ int linked_list_add_at(linked_list_t * linked_list, int index, void * element) {
 int linked_list_remove_at(linked_list_t * linked_list, int index) {
     int i = 0;
     node_t ** n;
-    n = &(linked_list->head);
-
     node_t * p;
+
+    n = &(linked_list->head);
 
     while (i < index)
     {
@@ -154,24 +149,26 @@ int linked_list_remove_at(linked_list_t * linked_list, int index) {
         i++;
     }
 
-    (*n) = (*n)->next;
+    p = *n;
+    (*n) = p->next;
+    free(p);
+
+    linked_list->length--;
 
     return 1;
 };
 
 
 int linked_list_foreach(linked_list_t * linked_list, int (*callback)(int index, void *)) {
-    int index = 0;
+    int i = 0;
     node_t ** n;
     n = &(linked_list->head);
 
-    node_t * p;
-
     while (*n != NULL)
     {
-        callback(index, (*n)->element);
+        callback(i, (*n)->element);
         n = &(*n)->next;
-        index++;
+        i++;
     }
 
     return 0;

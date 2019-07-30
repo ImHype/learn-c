@@ -21,7 +21,6 @@ int main(int argc, char const *argv[])
 
     assert(size == 0);
 
-
     assert(linked_list_head(linked_list) == NULL);
 
     int arr[] = { 1, 2, 3};
