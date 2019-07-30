@@ -6,19 +6,24 @@
 #include <unistd.h> 
 
 int socket_fd;
+struct sigaction act;
 
-void graceful() {
-    close(socket_fd);
-    exit(0);
-}
+// void graceful() {
+//     close(socket_fd);
+//     exit(0);
+// }
 
 char * response = "HTTP/1.1 200 OK\r\nContent-Type: text/html;charset=utf-8\r\nConnection: keep-alive\r\n\r\n<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"UTF-8\" /><title>Document</title></head><body><p>this is http response</p></body></html>";
 
 int main(int argc, char const *argv[])
 {
-    signal(SIGHUP, graceful);
-    signal(SIGINT, graceful);
-    signal(SIGQUIT, graceful);
+    // signal(SIGHUP, graceful);
+    // signal(SIGINT, graceful);
+    // signal(SIGQUIT, graceful);
+
+    act.sa_handler = SIG_IGN;
+    sigaction(SIGPIPE, &act, NULL);
+
 
     struct sockaddr_in address;
     struct sockaddr_in cliaddr;
@@ -75,6 +80,9 @@ int main(int argc, char const *argv[])
             perror("shutdown");
         };
 
+        if (write(client_fd, response, strlen(response)) < 0) {
+            perror("write");
+        }
 
         int size = read(client_fd, buf, sizeof(buf));
 
