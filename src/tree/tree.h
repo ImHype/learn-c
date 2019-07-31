@@ -3,13 +3,14 @@ typedef struct node_t
     struct node_t * left;
     struct node_t * right;
     int value;
+    void * data;
 } node_t;
 
 
 node_t * node_init(int value);
-node_t * node_search(node_t * tree, int value);
-int node_visit(node_t * tree, int (*callback)(node_t * node));
-int node_add_node(node_t * tree, node_t * node);
+node_t * node_search(node_t ** tree, int value);
+int node_visit(node_t ** tree, int (*callback)(node_t * node));
+int node_add_node(node_t ** tree, node_t * node);
 
 
 typedef struct tree_t
