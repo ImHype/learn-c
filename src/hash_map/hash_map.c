@@ -4,7 +4,7 @@
 #include "string.h"
 
 hashentry_t * hashentry_init(void * key, void * value) {
-    hashentry_t * hashentry = malloc(sizeof(hashentry_t));
+    hashentry_t * hashentry = (hashentry_t *) malloc(sizeof(hashentry_t));
 
     hashentry->key = key;
     hashentry->value = value;
@@ -16,7 +16,6 @@ hashentry_t * hashentry_init(void * key, void * value) {
 
 int hash_map_put(hashmap_t * hashmap, void * key, void * value) {
     int index = hashmap->hashcode(hashmap, key);
-
 
     hashentry_t ** hashentry = hashmap->hashentry + index;
 
