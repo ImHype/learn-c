@@ -1,13 +1,30 @@
 #include "heap.h"
+#include <stdio.h>
 
-
+#define ARRAY_SIZE(arr) sizeof(arr) / sizeof(arr[0])
 int main(int argc, char const *argv[])
 {
     heap_t heap;
-    heap_t * h;
+    heap_t * h = &heap;
 
-    init_heap(h);
+    init_heap(h, 1024);
 
-    h->insert(h, 1);
+    int arr[] = {1,2,3,4,5,6,7,8,9,10,100, -1, -2,-3};
+
+
+    for (int i = 0; i < ARRAY_SIZE(arr); i++)
+    {
+
+        h->insert(h, arr[i]);
+    }
+
+    for (int i = 0; i < ARRAY_SIZE(arr); i++)
+    {
+        int pop_num;
+        h->pop(h, &pop_num);
+
+        printf("%d\n", pop_num);
+    }
+
     return 0;
 }

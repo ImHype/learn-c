@@ -1,23 +1,20 @@
-typedef struct node_s node_t;
 typedef struct heap_s heap_t;
-
-struct node_s {
-    node_t * left;
-    node_t * right;
-    int data;
-};
 
 typedef int (*insert_heap_t)(heap_t * heap, int value);
 
-typedef int (*del_heap_t)(heap_t * heap, int value);
+typedef int (*del_heap_t)(heap_t * heap, int * pop_node);
 
 struct heap_s {
-    node_t * root;
+    int * data;
+
+    int size;
+
+    // int capacity;
 
     insert_heap_t insert;
 
-    del_heap_t del;
+    del_heap_t pop;
 };
 
 
-int init_heap(heap_t * heap);
+int init_heap(heap_t * heap, int capacity);
