@@ -53,7 +53,7 @@ buffer:
 	@$(MAKE) buffer.o && ./buffer.o
 
 event:
-	@$(MAKE) event.o && ./event.o
+	@gcc ./src/event/*.c ./src/hash_map/hash_map.c ./src/linked-list/linked-list.c -o event.o;./event.o
 
 pipe_channel:
 	$(MAKE) pipe_channel.o && ./pipe_channel.o
