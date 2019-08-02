@@ -1,20 +1,20 @@
-typedef struct heap_s heap_t;
+typedef struct min_heap_s min_heap_t;
 
-typedef int (*insert_heap_t)(heap_t * heap, int value);
+typedef int (*push_min_heap_t)(min_heap_t * heap, int value);
 
-typedef int (*del_heap_t)(heap_t * heap, int * pop_node);
+typedef int (*del_min_heap_t)(min_heap_t * heap, int * pop_node);
 
-struct heap_s {
+struct min_heap_s {
     int * data;
 
     int size;
 
     // int capacity;
 
-    insert_heap_t insert;
+    push_min_heap_t push;
 
-    del_heap_t pop;
+    del_min_heap_t pop;
 };
 
 
-int init_heap(heap_t * heap, int capacity);
+int init_min_heap(min_heap_t * heap, int capacity);
