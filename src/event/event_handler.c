@@ -6,27 +6,26 @@
 
 
 handler_t * create_handler(char* name, handler_callback_t callback) {
-    handler_t * handler = malloc(sizeof(handler_t));
+    handler_t * h = malloc(sizeof(handler_t));
 
-    handler->name = name;
-    handler->callback = callback;
+    h->name = name;
+    h->callback = callback;
 
-    return handler;
+    return h;
 }
 
 int on(event_emitter_t * event_emitter, char* name, handler_callback_t callback) {
     hashmap_t * map = event_emitter->map;
-    linked_list_t * linked_list = (linked_list_t *) map->get(map, name);
+    linked_list_t * l = (linked_list_t *) map->get(map, name);
 
+    if (l == NULL) {
+        l = malloc(sizeof(linked_list_t));
+        create_linked_list(l);
 
-    if (linked_list == NULL) {
-        linked_list = malloc(sizeof(linked_list_t));
-        create_linked_list(linked_list);
-
-        map->put(map, name, linked_list);
+        map->put(map, name, l);
     }
 
-    linked_list_add(linked_list, create_handler(name, callback));
+    linked_list_add(l, create_handler(name, callback));
 
     return 0;
 };
@@ -34,15 +33,15 @@ int on(event_emitter_t * event_emitter, char* name, handler_callback_t callback)
 
 int emit(event_emitter_t * event_emitter, char* name, void* val) {
     hashmap_t * map = event_emitter->map;
-    linked_list_t * linked_list = (linked_list_t *) map->get(map, name);
+    linked_list_t * l = (linked_list_t *) map->get(map, name);
 
-    if (linked_list == NULL) {
+    if (l == NULL) {
         return -1;
     }
 
     handler_t * it;
 
-    LIST_FOREACH_BEGIN(linked_list, it)
+    LIST_FOREACH_BEGIN(l, it)
         it->callback(val);
     LIST_FOREACH_END;
 
