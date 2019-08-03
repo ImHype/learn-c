@@ -111,7 +111,7 @@ node_t * skip_list_find(skip_list_t * skip_list, int value) {
 
 int skip_list_remove(skip_list_t * skip_list, int value) {
     node_t * head = skip_list->head;
-    node_t * prev = NULL;
+    node_t ** prev = &skip_list->head;
 
     if (head == NULL) {
         return -2;
@@ -136,7 +136,7 @@ int skip_list_remove(skip_list_t * skip_list, int value) {
             if (item->value > value) {
                 break;
             }
-            prev = head;
+            prev = &head;
             head = item;
         }
 
@@ -153,12 +153,7 @@ int skip_list_remove(skip_list_t * skip_list, int value) {
 
     for (int i = level; i >= 0; i--)
     {
-        node_t * node = predecessors[i]->next[i];
-        if (prev) {
-            prev->next[i] = node;
-        } else {
-            skip_list->head = node;
-        }
+        *prev = predecessors[i]->next[i];
     }
 
     free(head->next);
