@@ -3,6 +3,9 @@
 
 typedef struct node_s node_t; 
 typedef struct skip_list_s skip_list_t; 
+typedef int (*insert_t)(skip_list_t * skip_list, int value);
+typedef node_t * (*find_t)(skip_list_t * skip_list, int value);
+typedef int (*remove_t)(skip_list_t * skip_list, int value);
 
 struct node_s
 {
@@ -16,6 +19,10 @@ struct skip_list_s
     int max_level;
     int level;
     node_t * head;
+
+    insert_t insert;
+    find_t find;
+    remove_t remove;
 };
 
 

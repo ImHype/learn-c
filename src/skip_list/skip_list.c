@@ -2,11 +2,6 @@
 #include "skip_list.h"
 #include <string.h>
 
-int init_skip_list(skip_list_t * skip_list) {
-    skip_list->max_level = MAX_LEVEL;
-    skip_list->level = 0;
-    return 0;
-};
 
 node_t * create_node(int value, int max_level) {
     node_t * node = malloc(sizeof(node_t));
@@ -168,6 +163,19 @@ int skip_list_remove(skip_list_t * skip_list, int value) {
 
     free(head->next);
     free(head);
+
+    return 0;
+};
+
+
+
+int init_skip_list(skip_list_t * skip_list) {
+    skip_list->max_level = MAX_LEVEL;
+    skip_list->level = 0;
+
+    skip_list->insert = skip_list_insert;
+    skip_list->remove = skip_list_remove;
+    skip_list->find = skip_list_find;
 
     return 0;
 };
