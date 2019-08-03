@@ -10,13 +10,13 @@ int main(int argc, char const *argv[])
 
     init_skip_list(p);
 
-    skip_list_insert(p, 1);
-    skip_list_insert(p, 2);
+    p->insert(p, 1);
+    p->insert(p, 2);
 
     node_t * tmp = p->find(p, 1);
     assert(tmp && tmp->value == 1);
 
-    skip_list_insert(p, 3);
+    p->insert(p, 3);
 
     tmp = p->find(p, 3);
     assert(tmp && tmp->value == 3);
