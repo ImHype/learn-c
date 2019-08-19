@@ -1,1 +1,0 @@
-int topk(int arr[], int size, int ret_arr[], int ret_size);
